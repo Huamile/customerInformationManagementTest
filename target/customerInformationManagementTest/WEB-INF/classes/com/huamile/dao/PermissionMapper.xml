@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huamile.dao.PermissionMapper">
+    <resultMap id="BaseResultMapForPinfo" type="com.huamile.mapper.Permission">
+        <id column="permissionId" property="permissionId"/>
+        <result column="pname" property="pname"/>
+        <result column="purl" property="purl"/>
+        <result column="ismenu" property="ismenu"/>
+        <result column="parentId" property="parentId"/>
+        <result column="pinfo" property="pinfo"/>
+        <!--一对多子权限查询-->
+        <collection property="permissionsListOfSon" select="selectSonByParentIdBut" column="permissionId"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapForPname" type="com.huamile.mapper.Permission">
+        <id column="permissionId" property="permissionId"/>
+        <result column="pname" property="pname"/>
+        <result column="purl" property="purl"/>
+        <result column="ismenu" property="ismenu"/>
+        <result column="parentId" property="parentId"/>
+        <result column="pinfo" property="pinfo"/>
+        <!--一对多子权限查询-->
+        <collection property="permissionsListOfSon" select="selectSonByParentId" column="permissionId"/>
+    </resultMap>
+
+    <!--=====针对一对多的查询语句，根据父亲的id找到儿子=====-->
+    <!--为pinfo-->
+    <select id="selectSonByParentIdBut" parameterType="Integer" resultMap="BaseResultMapForPinfo">
+        select * from permission where parentId = #{id} and ismenu = 0
+    </select>
+    <!--为pname-->
+    <select id="selectSonByParentId" parameterType="Integer" resultMap="BaseResultMapForPname">
+        select * from permission where parentId = #{id}
+    </select>
+    <!--获取pname-->
+    <select id="selectByEmpLoginName" parameterType="String" resultMap="BaseResultMapForPname">
+        select p.* from employees emp,permission p,rolepermission rp where emp.roleId = rp.roleId and p.permissionId = rp.permissionId and empLoginName = #{empLoginName}
+    </select>
+    <!--获取pinfo-->
+    <select id="selectPinfoByParentId" parameterType="Integer" resultMap="BaseResultMapForPinfo">
+        select * from permission where parentId = 0;
+    </select>
+</mapper>

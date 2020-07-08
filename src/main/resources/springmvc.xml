@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans.xsd
+               http://www.springframework.org/schema/mvc
+               http://www.springframework.org/schema/mvc/spring-mvc.xsd
+               http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--扫描controller注解，别的不扫描-->
+    <context:component-scan base-package="com.huamile">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--配置视图解析器-->
+    <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!--JSP文件所在的目录-->
+        <property name="prefix" value="/WEB-INF/" />
+        <!--文件的后缀名-->
+        <property name="suffix" value=".jsp"  />
+    </bean>
+
+    <!-- 设置静态资源不过滤 -->
+    <!--方法1-->
+    <mvc:default-servlet-handler/>
+    <!--方法2-->
+    <!--<mvc:resources location="/css/" mapping="/css/**" />
+    <mvc:resources location="/images/" mapping="/images/**" />
+    <mvc:resources location="/js/" mapping="/js/**" />
+    <mvc:resources location="/fonts/" mapping="/fonts/**" />
+    <mvc:resources location="/vendor/" mapping="/vendor/**" />
+    <mvc:resources location="/layui/" mapping="/layui/**" />-->
+
+    <!--配置拦截器,这里交由shiro来进行拦截-->
+    <!--<mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.huamile.interceptor.MyInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>-->
+
+    <!--开启springmvc注解支持-->
+    <mvc:annotation-driven/>
+
+    <!--=====国际化配置=====-->
+    <!--资源文件-->
+    <bean name="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="message"/>
+    </bean>
+    <!--配置国际化的拦截器-->
+    <mvc:interceptors>
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"/>
+    </mvc:interceptors>
+    <!--配置SessionLocaleResolver-->
+    <bean name="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
+
+    <!--=====shiro的注解配置=====-->
+    <aop:config proxy-target-class="true"/>
+    <!--保证shiro的执行对象-->
+    <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <!--通知器-->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+    <bean class="com.huamile.exception.MyException"/>
+
+
+</beans>
